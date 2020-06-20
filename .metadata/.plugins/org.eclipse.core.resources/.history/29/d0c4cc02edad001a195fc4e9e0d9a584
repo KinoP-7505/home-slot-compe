@@ -1,0 +1,11 @@
+package com.hsc.back.dto;
+
+
+//
+// エンティティに共通項目を付与するクラス
+//
+public abstract class HistoryData {
+    private String regist_date;  // 登録日
+    private String edit_date;  // 更新日
+    private String creator;  // 作成者
+}

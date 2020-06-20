@@ -1,0 +1,14 @@
+package com.hsc.back.dto;
+
+import javax.persistence.Entity;
+
+import lombok.Data;
+
+@Data
+@Entity
+public class HistoryData {
+    @Data
+	private String regist_date;  // “o˜^“ú
+    private String edit_date;  // XV“ú
+   private String creator;  // ì¬Ò
+}

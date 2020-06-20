@@ -1,0 +1,97 @@
+version: '3.5'
+
+services:
+    dbserver:
+      # マウントするsql名とバージョン
+      image: mysql:8.0.20
+
+      # コンテナ名
+      container_name: hsc-mysql
+
+      # hostname
+      hostname: db-server
+
+      # リスタートするか
+      restart: always
+    
+      # expose:
+      #  - 3306
+      # ポート変換（表localhost:3306 -> コンテナ: 3306）
+      ports:
+        - 3306:3306
+      networks:
+        # ここに指定するのは実際のネットワーク名ではなく、↓のnetworksの識別子
+        - container-link        
+      volumes:
+        - ./mysql/conf.d:/etc/mysql/conf.d
+        - ./mysql/init:/docker-entrypoint-initdb.d
+        - ./mysql/data:/var/lib/mysql
+        - ./mysql/log/mysql:/var/log/mysql
+      environment:
+        MYSQL_ROOT_PASSWORD: rootp@ss
+        MYSQL_DATABASE: hsc-db
+        MYSQL_USER: user01
+        MYSQL_PASSWORD: user01p@ss
+
+    app:
+        image: "adoptopenjdk/openjdk11:alpine-slim"
+        # image: "adoptopenjdk/openjdk11:jdk-11.0.6_10-alpine"
+        container_name: hsc-spb
+        # hostnameback
+        hostname: back-server
+        volumes: 
+            - "./hsc-back:${SPRING_PATH_IN_CONTAINER}"
+        ports:
+            - 8080:8080
+            # デバッグ用ポート
+            # - 5050:5050
+        networks:
+            # ここに指定するのは実際のネットワーク名ではなく、↓のnetworksの識別子
+            - container-link             
+        working_dir: ${SPRING_PATH_IN_CONTAINER}
+            # aplineにはbashがなくashを使用
+        command: /bin/ash -c "./gradlew bootRun"
+        depends_on:
+            - dbserver
+
+    web: 
+      build:
+        context: ./
+        dockerfile: ./docker/front/Dockerfile
+        args:
+          - NODE_VERSION=${NODE_VERSION}
+          - USER_ID=${UID}
+          - GROUP_ID=${GROUPS}
+      container_name: hsc-nuxt
+      hostname: front-server
+      ports:
+          - 3000:3000
+      networks:
+        # ここに指定するのは実際のネットワーク名ではなく、↓のnetworksの識別子
+        - container-link
+      environment:
+        HOST: "0.0.0.0"
+      # command: bash -c "yarn && yarn dev"
+      command: npm run dev
+      volumes:
+        - ./hsc-front:/app:cached
+      depends_on:
+        - app
+
+# ネットワーク定義
+networks:
+    # docker-composeで勝手にデフォルトネットワークが生成される予防。
+    #（自動で全コンテナが所属するbridgeを指定）
+    default: 
+      external: 
+        name: bridge 
+    # コンテナ間通信用のネットワークセグメント
+    container-link: 
+      # これが作成されるネットワーク名（同名がなければ自動生成される）*Ver3.5以降
+      name: docker-internal
+      # 以下は書かなくてもよい（サンプルとして）
+      driver: bridge
+      ipam:
+        driver: default
+        config:
+          - subnet: "172.21.100.0/24"

@@ -1,0 +1,13 @@
+package com.hsc.back.dto;
+
+import lombok.Data;
+
+//
+// エンティティに共通項目を付与するクラス
+//
+@Data
+public class HistoryData {
+    private String regist_date;  // 登録日
+    private String edit_date;  // 更新日
+    private String creator;  // 作成者
+}

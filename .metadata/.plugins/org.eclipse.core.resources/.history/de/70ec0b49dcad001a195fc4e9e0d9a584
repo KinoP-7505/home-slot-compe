@@ -1,0 +1,30 @@
+package com.hsc.back.dto;
+
+//
+// エンティティに共通項目を付与するクラス
+//
+
+public class HistoryData {
+    private String regist_date;  // 登録日
+    private String edit_date;  // 更新日
+    private String creator;  // 作成者
+    
+	public String getRegist_date() {
+		return regist_date;
+	}
+	public void setRegist_date(String regist_date) {
+		this.regist_date = regist_date;
+	}
+	public String getEdit_date() {
+		return edit_date;
+	}
+	public void setEdit_date(String edit_date) {
+		this.edit_date = edit_date;
+	}
+	public String getCreator() {
+		return creator;
+	}
+	public void setCreator(String creator) {
+		this.creator = creator;
+	}
+}

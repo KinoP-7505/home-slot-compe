@@ -1,0 +1,5 @@
+package com.hsc.back.dto;
+
+public class ResponseContena {
+
+}
